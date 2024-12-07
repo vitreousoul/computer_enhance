@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <math.h>
+#include <limits.h> /* SSIZE_MAX */
 
 typedef uint8_t u8;
 typedef uint32_t u32;
@@ -82,7 +83,7 @@ int main(int ArgCount, char **Args)
                 NewTestWave(&TestSeries, &Tester, Setup.ParsedByteCount, GetCPUTimerFreq());
                 
                 u64 IndividualErrorCount = Function.Verify(Setup);
-                u64 SumErrorCount = {};
+                u64 SumErrorCount = 0;
                 
                 while(IsTesting(&TestSeries, &Tester))
                 {

@@ -224,6 +224,7 @@ inline void CloseMemoryMappedFile(memory_mapped_file *MappedFile)
 struct os_platform
 {
     b32 Initialized;
+    u64 LargePageSize; // NOTE(casey): This will be 0 when large pages are not supported (which is most of the time!)
     u64 CPUTimerFreq;
 };
 static os_platform GlobalOSPlatform;
@@ -279,7 +280,7 @@ static b32 ReadOSRandomBytes(u64 Count, void *Dest)
     // and do multiple read()'s to make sure you filled the entire buffer.
 
     int DevRandom = open("/dev/urandom", O_RDONLY);
-    b32 Result = (read(DevRandom, Dest.Data, Dest.Count) == Count);
+    b32 Result = (read(DevRandom, Dest, Count) == Count);
     close(DevRandom);
     
     return Result;
@@ -290,7 +291,7 @@ static u64 GetFileSize(char *FileName)
     struct stat Stat;
     stat(FileName, &Stat);
     
-    return Stat.st_size
+    return Stat.st_size;
 }
 
 static void InitializeOSPlatform(void)
@@ -304,7 +305,7 @@ static void InitializeOSPlatform(void)
 
 static void *OSAllocate(size_t ByteCount)
 {
-    void *Result = mmap(0, ByteCount, PROT_READ|PROT_WRITE, MAP_ANONYMOUS, 0, 0);
+    void *Result = mmap(0, ByteCount, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_PRIVATE, 0, 0);
     return Result;
 }
 
@@ -313,10 +314,12 @@ static void OSFree(size_t ByteCount, void *BaseAddress)
     munmap(BaseAddress, ByteCount);
 }
 
+#if 0
 inline void CreateThread()
 {
     IOThread = CreateThread(0, 0, IOThreadRoutine, &ThreadedIO, 0, 0);
 }
+#endif
 
 inline memory_mapped_file OpenMemoryMappedFile(char const *FileName)
 {
@@ -335,7 +338,7 @@ inline void SetMapRegion(memory_mapped_file *MappedFile, u64 Offset, u64 Size)
     if(IsValid(MappedFile->Memory))
     {
         munmap(MappedFile->Memory.Data, MappedFile->Memory.Count);
-        MappedFile->Memory = {};
+        MappedFile->Memory = (buffer){};
     }
     
     if(Size)
@@ -363,7 +366,7 @@ inline void CloseMemoryMappedFile(memory_mapped_file *MappedFile)
         close(MappedFile->File);
     }
     
-    *MappedFile = {};
+    *MappedFile = (memory_mapped_file){};
 }
 
 #endif

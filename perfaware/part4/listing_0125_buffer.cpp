@@ -20,7 +20,7 @@ struct buffer
     u8 *Data;
 };
 
-#define CONSTANT_STRING(String) {sizeof(String) - 1, (u8 *)(String)}
+#define CONSTANT_STRING(String) (buffer){sizeof(String) - 1, (u8 *)(String)}
 
 /* NOTE(casey): None of these functions should actually be inline - they
    should all just be "static". But I marked them as inline because that
@@ -82,5 +82,5 @@ inline void FreeBuffer(buffer *Buffer)
     {
         OSFree(Buffer->Count, Buffer->Data);
     }
-    *Buffer = {};
+    *Buffer = (buffer){};
 }

@@ -192,5 +192,5 @@ static void FreeHaversine(haversine_setup *Setup)
     FreeBuffer(&Setup->ParsedPairsBuffer);
     FreeBuffer(&Setup->AnswerBuffer);
     
-    *Setup = {};
+    *Setup = (haversine_setup){};
 }

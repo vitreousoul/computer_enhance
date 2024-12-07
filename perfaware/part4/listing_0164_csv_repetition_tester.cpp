@@ -265,7 +265,7 @@ static b32 IsTesting(repetition_tester *Tester)
                 
                 Tester->OpenBlockCount = 0;
                 Tester->CloseBlockCount = 0;
-                Tester->AccumulatedOnThisTest = {};
+                Tester->AccumulatedOnThisTest = (repetition_value){};
             }
         }
         
@@ -319,7 +319,7 @@ static void FreeTestSeries(repetition_test_series *Series)
     if(Series)
     {
         FreeBuffer(&Series->Memory);
-        *Series = {};
+        *Series = (repetition_test_series){};
     }
 }
 

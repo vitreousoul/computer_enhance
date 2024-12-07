@@ -290,8 +290,8 @@ static json_element *ParseJSONElement(json_parser *Parser, buffer Label, json_to
 
 static json_element *ParseJSONList(json_parser *Parser, json_token_type EndType, b32 HasLabels)
 {
-    json_element *FirstElement = {};
-    json_element *LastElement = {};
+    json_element *FirstElement = 0;
+    json_element *LastElement = 0;
     
     while(IsParsing(Parser))
     {
@@ -352,7 +352,7 @@ static json_element *ParseJSON(buffer InputJSON)
     json_parser Parser = {};
     Parser.Source = InputJSON;
     
-    json_element *Result = ParseJSONElement(&Parser, {}, GetJSONToken(&Parser));
+    json_element *Result = ParseJSONElement(&Parser, (buffer){}, GetJSONToken(&Parser));
     return Result;
 }
 
